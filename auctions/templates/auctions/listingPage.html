@@ -1,0 +1,52 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>{{listing.Name}}</h2>
+    {%if loggedIn%}
+        <form action="{% url 'listing' listing.id %}" method="POST">
+            {%csrf_token%}
+            {%if watching%}
+                <input type="submit" name="modifier" value="Remove from watchlist">
+            {%else%}
+                <input type="submit" name="modifier" value="Add to watchlist">
+            {%endif%}
+        </form>
+    {%endif%}
+    {%if error%}
+        <div style="background-color: yellow; color: black;">{{error}}</div>
+    {%endif%}
+    <img src="{{listing.Image}}"  style="max-width: 100%; max-height:500px;">
+    {%if bids%}
+        Number of bids={{bids}}
+        {{allBids}}
+    {%endif%}
+    {%if loggedIn%}
+        {%if listing.Active%}
+            {%if isOwner%}
+                <form action="{% url 'listing' listing.id %}" method="POST">
+                    {%csrf_token%}
+                    <input type="submit" name="action" value="End Biddings">
+                </form>
+            {%else%}
+                <form action="{% url 'listing' listing.id %}" method="POST">
+                    {%csrf_token%}
+                    {{form}}
+                    <input type="submit" value="Add Bid">
+                </form>
+                
+            {%endif%}
+
+        {%else%}
+            Winner: {{allBids.Bidder}}
+        {%endif%}
+        <form action="{%url 'listing' listing.id%}" method="POST">
+            {%csrf_token%}
+            {{commentForm}}
+            <input type="submit" name="comment" value="Post Comment">
+        </form>
+    {%endif%}
+    {%for comment in comments%} 
+        {{comment}}<br>
+    {%endfor%}
+    
+{% endblock %}

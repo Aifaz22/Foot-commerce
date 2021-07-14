@@ -1,0 +1,10 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Categories</h2>
+
+    {%if not cat%} No Categories to show {%endif%}
+    {% for c in cat %}
+        <li><a href= "{%url 'specificCat' c%}">{{c}}</a></li>
+    {%endfor%}
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Listings in your watchlist</h2>
+
+    {%if not listing%} No Active Listings {%endif%}
+    {% for list in listing %}
+        <a href="listing/{{list.id}}"><button style="background-color: white; text-align: left;" >
+            <table>
+                <tr>
+                    <td style="width: 20%;"><img src="{{list.Image}}" width="400px"></td>
+                    <td style="text-align: left; padding-left: 5%;">
+                        <h3>{{list}}</h3>
+                        <b>Price</b>: ${{list.Price}}
+                        {% if list.Description %} 
+                            <h5 style="color: grey; padding-top: 2%;">{{list.Description}}</h5>
+                        {%endif%}
+                        <h6>created on: {{list.PostDate.day}}-{{list.PostDate.month}}-{{list.PostDate.year}}, {{list.PostTime.hour}}:{{list.PostTime.minute}}</h6>
+                        category: {{list.Category}}
+                    </td>
+                </tr>
+            </table>
+        </button> </a>
+    {%endfor%}
+{% endblock %}
