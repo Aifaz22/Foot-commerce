@@ -2,9 +2,9 @@
 ### Work in progress
 ###### todo: Final touch-up and beautification
 Primarily for football player transfers and other football related ownerships
-Used Django framework and SQLite as the database
+Used Django framework (models and forms primarily) and SQLite as the database
 
-Features:
+###Features:
 - login/logout/create account
 - admin control
 - create a listing
@@ -15,4 +15,4 @@ Features:
 - add bids
 - end bidding (only the owner)
 
-Used Django models and forms alongside SQLite to create the website.
+##### Assignment taken from CS50 harvard project1 course on edX
