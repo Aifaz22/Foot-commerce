@@ -4,7 +4,7 @@
 Primarily for football player transfers and other football related ownerships
 Used Django framework (models and forms primarily) and SQLite as the database
 
-###Features:
+### Features:
 - login/logout/create account
 - admin control
 - create a listing
