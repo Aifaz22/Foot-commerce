@@ -37,7 +37,7 @@ class Bid(models.Model):
         ordering=['time']
     
     def __str__(self):
-        return f"{self.Bidder} => {self.currentBid}"
+        return f"Current Bid: ${self.currentBid}"
 
 class Comment(models.Model):
     Listing=models.ForeignKey(Listing,on_delete=models.CASCADE)

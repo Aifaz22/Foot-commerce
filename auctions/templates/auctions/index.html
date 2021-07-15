@@ -1,22 +1,31 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
+    <style>
+        
+        .listingMenu h5{
+             padding-top: 2%;
+            font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+            
+        }
+    </style>
     <h2>Active Listings {%if cat%} for the category: {{cat}} {%endif%}</h2>
 
     {%if not listing%} No Active Listings {%endif%}
     {% for list in listing %}
-        <a href="{%url 'listing' list.id %}"><button style="background-color: white; text-align: left;" >
+        <a href="{%url 'listing' list.id %}"><button class="btn btn-info" style=" text-align: left; width: 100%; padding: 2%; margin-top: 2%;" >
             <table>
                 <tr>
-                    <td style="width: 20%;"><img src="{{list.Image}}" width="400px"></td>
+                    <td width="400px"><img src="{{list.Image}}" class="img-thumbnail" ></td>
                     <td style="text-align: left; padding-left: 5%;">
-                        <h3>{{list}}</h3>
-                        <b>Price</b>: ${{list.Price}}
-                        {% if list.Description %} 
-                            <h5 style="color: grey; padding-top: 2%;">{{list.Description}}</h5>
-                        {%endif%}
-                        <h6>created on: {{list.PostDate.day}}-{{list.PostDate.month}}-{{list.PostDate.year}}, {{list.PostTime.hour}}:{{list.PostTime.minute}}</h6>
-                        category: {{list.Category}}
+                        <div class="listingMenu">
+                            <h2>{{list}}</h2>
+                            <b>Price</b>: ${{list.Price}}
+                            {% if list.Description %} 
+                                <h5><p>{{list.Description}}</p></h5>
+                            {%endif%}
+                            <h6>category: {{list.Category}}</h6>
+                        </div>
                     </td>
                 </tr>
             </table>

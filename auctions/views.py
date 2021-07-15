@@ -17,18 +17,35 @@ class ListingForm(ModelForm):
     class Meta:
         model=Listing
         exclude = ['Owner', 'Bids','Active']
+    def __init__(self, *args, **kwargs):
+        super(ListingForm, self).__init__(*args, **kwargs)
+        for field in iter(self.fields):
+            self.fields[field].widget.attrs.update({
+                'class': 'form-control'
+        })
 
 class newBid(forms.Form):
     newBid=forms.DecimalField(decimal_places=2, min_value=0)
+    def __init__(self, *args, **kwargs):
+        super(newBid, self).__init__(*args, **kwargs)
+        for field in iter(self.fields):
+            self.fields[field].widget.attrs.update({
+                'class': 'form-control'
+        })
 
 class addComment(ModelForm):
     class Meta:
         model=Comment
         fields=['content']
         widgets={
-            'content':forms.TextInput(attrs={'placeholder':'Add your comments here'})
+            'content':forms.TextInput(attrs={'placeholder':'Add your comments here','size':70})
         }
-
+    def __init__(self, *args, **kwargs):
+        super(addComment, self).__init__(*args, **kwargs)
+        for field in iter(self.fields):
+            self.fields[field].widget.attrs.update({
+                'class': 'form-control'
+        })
 def index(request):
     return render(request, "auctions/index.html",{
         "listing":Listing.objects.filter(Active=True)
@@ -121,7 +138,7 @@ def listing(request,ID):
                 return render(
                             request,"auctions/listingPage.html",{
                                 "listing":listing,
-                                "bids":listing.Bids.all().count(),
+                                "bids":listing.Bids.all().count()-1,
                                 "allBids":listing.Bids.latest('time'),
                                 "form":newBid,
                                 "watching":listing in request.user.Watchlist.all(),
@@ -136,7 +153,7 @@ def listing(request,ID):
                 return render(
                             request,"auctions/listingPage.html",{
                                 "listing":listing,
-                                "bids":listing.Bids.all().count(),
+                                "bids":listing.Bids.all().count()-1,
                                 "allBids":listing.Bids.latest('time'),
                                 "form":newBid,
                                 "watching":listing in request.user.Watchlist.all(),
@@ -155,7 +172,7 @@ def listing(request,ID):
                 return render(
                         request,"auctions/listingPage.html",{
                             "listing":listing,
-                            "bids":listing.Bids.all().count(),
+                            "bids":listing.Bids.all().count()-1,
                             "allBids":listing.Bids.latest('time'),
                             "form":newBid,
                             "watching":listing in request.user.Watchlist.all(),
@@ -172,7 +189,7 @@ def listing(request,ID):
                     return render(
                         request,"auctions/listingPage.html",{
                             "listing":listing,
-                            "bids":listing.Bids.all().count(),
+                            "bids":listing.Bids.all().count()-1,
                             "allBids":listing.Bids.latest('time'),
                             "form":newBid,
                             "watching":listing in request.user.Watchlist.all(),
@@ -192,7 +209,7 @@ def listing(request,ID):
                         return render(
                             request, "auctions/listingPage.html",{
                                 "listing":listing,
-                                "bids":listing.Bids.all().count(),
+                                "bids":listing.Bids.all().count()-1,
                                 "form":newBid,
                                 "error":"Error: You are already the highest bidder!",
                                 "allBids":listing.Bids.latest('time'),
@@ -212,7 +229,7 @@ def listing(request,ID):
                         return render(
                             request, "auctions/listingPage.html",{
                                 "listing":listing,
-                                "bids":listing.Bids.all().count(),
+                                "bids":listing.Bids.all().count()-1,
                                 "form":newBid,
                                 "allBids":listing.Bids.latest('time'),
                                 "isOwner":request.user==listing.Owner,
@@ -230,7 +247,7 @@ def listing(request,ID):
                         return render(
                             request, "auctions/listingPage.html",{
                                 "listing":listing,
-                                "bids":listing.Bids.all().count(),
+                                "bids":listing.Bids.all().count()-1,
                                 "form":newBid,
                                 "allBids":listing.Bids.latest('time'),
                                 "isOwner":request.user==listing.Owner,
@@ -246,7 +263,7 @@ def listing(request,ID):
                         return render(
                             request, "auctions/listingPage.html",{
                                 "listing":listing,
-                                "bids":listing.Bids.all().count(),
+                                "bids":listing.Bids.all().count()-1,
                                 "form":newBid,
                                 "error":"Error: Bid should be greater than the price",
                                 "allBids":listing.Bids.latest('time'),
@@ -261,7 +278,7 @@ def listing(request,ID):
             return render(
                 request, "auctions/listingPage.html",{
                     "listing":listing,
-                    "bids":listing.Bids.all().count(),
+                    "bids":listing.Bids.all().count()-1,
                     "allBids":listing.Bids.latest('time'),
                     "loggedIn":request.user.is_authenticated,
                     "comments":Comment.objects.filter(Listing=listing)
@@ -271,7 +288,7 @@ def listing(request,ID):
         return render(
             request, "auctions/listingPage.html",{
                 "listing":listing,
-                "bids":listing.Bids.all().count(),
+                "bids":listing.Bids.all().count()-1,
                 "allBids":listing.Bids.latest('time'),
                 "form":newBid,
                 "loggedIn":request.user.is_authenticated,
@@ -285,7 +302,7 @@ def listing(request,ID):
         return render(
             request, "auctions/listingPage.html",{
                 "listing":listing,
-                "bids":listing.Bids.all().count(),
+                "bids":listing.Bids.all().count()-1,
                 "allBids":listing.Bids.latest('time'),
                 "form":newBid,
                 "loggedIn":request.user.is_authenticated,

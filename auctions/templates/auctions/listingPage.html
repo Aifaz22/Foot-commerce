@@ -1,52 +1,69 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
+<style>
+    h2 {
+        font-family: fantasy;
+    }
+    .listingMenu h5{
+        color: rgb(2, 0, 94); padding-top: 2%;
+        font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        
+    }
+</style>
     <h2>{{listing.Name}}</h2>
     {%if loggedIn%}
         <form action="{% url 'listing' listing.id %}" method="POST">
             {%csrf_token%}
             {%if watching%}
-                <input type="submit" name="modifier" value="Remove from watchlist">
+                <input type="submit" name="modifier" class="btn btn-warning" value="Remove from watchlist">
             {%else%}
-                <input type="submit" name="modifier" value="Add to watchlist">
+                <input type="submit" name="modifier" class="btn btn-info" value="Add to watchlist">
             {%endif%}
         </form>
     {%endif%}
     {%if error%}
         <div style="background-color: yellow; color: black;">{{error}}</div>
     {%endif%}
-    <img src="{{listing.Image}}"  style="max-width: 100%; max-height:500px;">
-    {%if bids%}
-        Number of bids={{bids}}
-        {{allBids}}
-    {%endif%}
-    {%if loggedIn%}
-        {%if listing.Active%}
+    <img src="{{listing.Image}}" class="img-thumbnail" style="max-width: 100%; max-height:350px; "> <br>
+    {%if listing.Active%}
             {%if isOwner%}
                 <form action="{% url 'listing' listing.id %}" method="POST">
                     {%csrf_token%}
-                    <input type="submit" name="action" value="End Biddings">
+                    <input type="submit" name="action" class="btn btn-danger" value="End Biddings">
                 </form>
             {%else%}
                 <form action="{% url 'listing' listing.id %}" method="POST">
                     {%csrf_token%}
                     {{form}}
-                    <input type="submit" value="Add Bid">
+                    <input type="submit" class="btn btn-info" value="Add Bid">
                 </form>
                 
             {%endif%}
 
         {%else%}
-            Winner: {{allBids.Bidder}}
+            <h2>Winner: {{allBids.Bidder}}</h2>
         {%endif%}
-        <form action="{%url 'listing' listing.id%}" method="POST">
+    <p>{{listing.Description}}</p>
+    {%if bids%}
+        Number of bids={{bids}}<br>
+        {{allBids}}
+    {%endif%}
+    {%if loggedIn%}
+        
+        <hr>
+        <form class="form-horizontal" action="{%url 'listing' listing.id%}" method="POST">
             {%csrf_token%}
-            {{commentForm}}
-            <input type="submit" name="comment" value="Post Comment">
+            <div class="form-group">{{commentForm}}</div>
+            <input type="submit" name="comment" class="btn btn-info" value="Post Comment">
         </form>
     {%endif%}
+    <div class="container"><div class="panel-group">
     {%for comment in comments%} 
-        {{comment}}<br>
+        <div class="panel panel-warning">
+            <div class="panel-heading">{{comment.User}}</div>
+            <div class="panel-body">{{comment.content}}</div>
+        </div>
     {%endfor%}
-    
+    </div></div>
 {% endblock %}

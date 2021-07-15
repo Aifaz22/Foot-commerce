@@ -4,7 +4,9 @@
     <h2>Categories</h2>
 
     {%if not cat%} No Categories to show {%endif%}
+    <ul class="list-group">
     {% for c in cat %}
-        <li><a href= "{%url 'specificCat' c%}">{{c}}</a></li>
+        <a href= "{%url 'specificCat' c%}" class="list-group-item list-group-item-info">{{c}}</a>
     {%endfor%}
+    </ul>
 {% endblock %}

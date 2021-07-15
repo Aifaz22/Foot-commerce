@@ -1,25 +1,34 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
+<style>
+        
+    .listingMenu h5{
+         padding-top: 2%;
+        font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        
+    }
+</style>
     <h2>Listings in your watchlist</h2>
 
     {%if not listing%} No Active Listings {%endif%}
     {% for list in listing %}
-        <a href="listing/{{list.id}}"><button style="background-color: white; text-align: left;" >
-            <table>
-                <tr>
-                    <td style="width: 20%;"><img src="{{list.Image}}" width="400px"></td>
-                    <td style="text-align: left; padding-left: 5%;">
-                        <h3>{{list}}</h3>
+    <a href="{%url 'listing' list.id %}"><button class="btn btn-info" style=" text-align: left; width: 100%; padding: 2%; margin-top: 2%;" >
+        <table>
+            <tr>
+                <td><img src="{{list.Image}}" class="img-thumbnail" width="400px"></td>
+                <td style="text-align: left; padding-left: 5%; ">
+                    <div class="listingMenu">
+                        <h2>{{list}}</h2>
                         <b>Price</b>: ${{list.Price}}
                         {% if list.Description %} 
-                            <h5 style="color: grey; padding-top: 2%;">{{list.Description}}</h5>
+                            <h5><p>{{list.Description}}</p></h5>
                         {%endif%}
-                        <h6>created on: {{list.PostDate.day}}-{{list.PostDate.month}}-{{list.PostDate.year}}, {{list.PostTime.hour}}:{{list.PostTime.minute}}</h6>
-                        category: {{list.Category}}
-                    </td>
-                </tr>
-            </table>
-        </button> </a>
+                        <h6>category: {{list.Category}}</h6>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </button> </a>
     {%endfor%}
 {% endblock %}
