@@ -1,5 +1,4 @@
 # Foot-commerce
-### Work in progress
 
 Primarily for football player transfers and other football related auctions
 Used Django framework (models and forms primarily) and SQLite as the database
