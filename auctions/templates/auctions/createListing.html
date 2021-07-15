@@ -4,7 +4,7 @@
     <h2>Create Listing</h2>
     <form  action="{% url 'createListing' %}" method="POST">
         {% csrf_token %}
-        <div class="form-group">{{form}}<br></div>
+        <div class="form-group">{{form}}</div>
             
         <input type="submit" class="btn-info" value="Post Listing">
     </form>

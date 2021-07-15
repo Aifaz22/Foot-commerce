@@ -13,12 +13,15 @@ from django.db.models import Max
 class ListingForm(ModelForm):
     if not Categories.objects.filter(category="No Category").exists():
         Categories(category="No Category").save()
-    newCat= forms.CharField(max_length=150, required=False, widget=forms.TextInput(attrs={"placeholder":"Add unlisted category"}))
+    newCat= forms.CharField(label="", max_length=150, required=False, widget=forms.TextInput(attrs={"placeholder":"Other unlisted category" }))
     class Meta:
         model=Listing
         exclude = ['Owner', 'Bids','Active']
+    
+
     def __init__(self, *args, **kwargs):
         super(ListingForm, self).__init__(*args, **kwargs)
+        #add class to each form fields for css
         for field in iter(self.fields):
             self.fields[field].widget.attrs.update({
                 'class': 'form-control'
@@ -28,6 +31,7 @@ class newBid(forms.Form):
     newBid=forms.DecimalField(decimal_places=2, min_value=0)
     def __init__(self, *args, **kwargs):
         super(newBid, self).__init__(*args, **kwargs)
+        #add class to each form fields for css
         for field in iter(self.fields):
             self.fields[field].widget.attrs.update({
                 'class': 'form-control'
@@ -42,23 +46,27 @@ class addComment(ModelForm):
         }
     def __init__(self, *args, **kwargs):
         super(addComment, self).__init__(*args, **kwargs)
+        #add class to each form fields for css
         for field in iter(self.fields):
             self.fields[field].widget.attrs.update({
                 'class': 'form-control'
         })
 def index(request):
     return render(request, "auctions/index.html",{
+        #get all active listings
         "listing":Listing.objects.filter(Active=True)
     })
 
 def category(request):
     return render(request, "auctions/category.html",{
+        #get all listed categories
         "cat":Categories.objects.all()
     })
 
 def specificCat(request, cat):
     return render(request, "auctions/index.html",{
         "cat":cat,
+        #get listings from specific cat
         "listing":Listing.objects.filter(Category__category=cat)
     })
 
@@ -66,6 +74,7 @@ def specificCat(request, cat):
 @login_required
 def watchlist(request):
     return render(request, "auctions/watchlist.html",{
+        #get listings from the watchlist
         "listing":request.user.Watchlist.all()
     })
 
@@ -73,6 +82,7 @@ def watchlist(request):
 @login_required
 def createListing(request):
     form=ListingForm(request.POST)
+    #check for form submission
     if request.method=="POST":
         if form.is_valid():
             Owner=request.user
@@ -80,6 +90,8 @@ def createListing(request):
             Description=form.cleaned_data['Description']
             Price=form.cleaned_data['Price']
             newCat=form.cleaned_data['newCat']
+            # add new category if needed or use the selected category
+            # priority to new category***
             if len(newCat)>=1:
                 if not Categories.objects.filter(category=newCat).exists():
                     Categories(category=newCat).save()
@@ -91,14 +103,13 @@ def createListing(request):
                 Image="https://i.stack.imgur.com/y9DpT.jpg"
             bid=Bid(Bidder=Owner,currentBid=Price)
             bid.save()
+            #create listing and save it in the database
             newListing=Listing(Owner=Owner,Name=Name,Description=Description,Price=Price,Category=Category,Image=Image)
-            
-            
             newListing.save()
             newListing.Bids.add(bid)
             newListing.save()
-            return HttpResponseRedirect(reverse('listing',args={newListing.id}))
-    if not Categories.objects.filter(category="No Category").exists():
+            return HttpResponseRedirect(reverse('listing',args={newListing.id})) # redirect to the new listing's page
+    if not Categories.objects.filter(category="No Category").exists(): #check to make a "No Category" if its deleted
         Categories(category="No Category").save()
     return render(
         request, "auctions/createListing.html",{
@@ -130,16 +141,17 @@ def listing(request,ID):
     '''
     listing=Listing.objects.get(pk=ID)
     maxBid=listing.Bids.latest('time')
-    
+    # check for form submission
     if (request.method=="POST"):
         if request.user.is_authenticated:
+            #check if it is to add or remove from watchlist as update database accordingly
             if request.POST.get("modifier")=='Add to watchlist':
                 request.user.Watchlist.add(listing)
                 return render(
                             request,"auctions/listingPage.html",{
                                 "listing":listing,
                                 "bids":listing.Bids.all().count()-1,
-                                "allBids":listing.Bids.latest('time'),
+                                "highestBid":listing.Bids.latest('time'),
                                 "form":newBid,
                                 "watching":listing in request.user.Watchlist.all(),
                                 "loggedIn":request.user.is_authenticated,   
@@ -154,7 +166,7 @@ def listing(request,ID):
                             request,"auctions/listingPage.html",{
                                 "listing":listing,
                                 "bids":listing.Bids.all().count()-1,
-                                "allBids":listing.Bids.latest('time'),
+                                "highestBid":listing.Bids.latest('time'),
                                 "form":newBid,
                                 "watching":listing in request.user.Watchlist.all(),
                                 "loggedIn":request.user.is_authenticated,
@@ -163,6 +175,7 @@ def listing(request,ID):
                                 "comments":Comment.objects.filter(Listing=listing)
                             }
                         )
+            # check if request is to post comment, if so add the comment
             if request.POST.get("comment")=='Post Comment':
                 form=addComment(request.POST)
                 if form.is_valid():
@@ -173,7 +186,7 @@ def listing(request,ID):
                         request,"auctions/listingPage.html",{
                             "listing":listing,
                             "bids":listing.Bids.all().count()-1,
-                            "allBids":listing.Bids.latest('time'),
+                            "highestBid":listing.Bids.latest('time'),
                             "form":newBid,
                             "watching":listing in request.user.Watchlist.all(),
                             "loggedIn":request.user.is_authenticated,
@@ -182,6 +195,7 @@ def listing(request,ID):
                             "comments":Comment.objects.filter(Listing=listing)
                         }
                     )
+            # check if the request is mady by the owner, if so, confirm if it is to end the bidding and update database accordingly
             if request.user==listing.Owner:
                 if request.POST.get('action')=='End Biddings':
                     listing.Active=False
@@ -190,7 +204,7 @@ def listing(request,ID):
                         request,"auctions/listingPage.html",{
                             "listing":listing,
                             "bids":listing.Bids.all().count()-1,
-                            "allBids":listing.Bids.latest('time'),
+                            "highestBid":listing.Bids.latest('time'),
                             "form":newBid,
                             "watching":listing in request.user.Watchlist.all(),
                             "loggedIn":request.user.is_authenticated,
@@ -200,6 +214,7 @@ def listing(request,ID):
                         }
                     )
             else:
+                # This will have to be a request for adding a Bid as other cases checked previously and we check for different cases
                 form=newBid(request.POST)
                 if form.is_valid():
                     value=form.cleaned_data['newBid']
@@ -212,7 +227,7 @@ def listing(request,ID):
                                 "bids":listing.Bids.all().count()-1,
                                 "form":newBid,
                                 "error":"Error: You are already the highest bidder!",
-                                "allBids":listing.Bids.latest('time'),
+                                "highestBid":listing.Bids.latest('time'),
                                 "isOwner":request.user==listing.Owner,
                                 "watching":listing in request.user.Watchlist.all(),
                                 "loggedIn":request.user.is_authenticated,
@@ -220,7 +235,7 @@ def listing(request,ID):
                                 "comments":Comment.objects.filter(Listing=listing)
                             }
                         )
-                    #correct bid made
+                    #correct starting bid made
                     if value==listing.Price and maxBid.Bidder==listing.Owner:
                         Listing.objects.filter(pk=ID).update(Price=value)
                         newBidMade=Bid(Bidder=request.user, currentBid=value)
@@ -231,7 +246,7 @@ def listing(request,ID):
                                 "listing":listing,
                                 "bids":listing.Bids.all().count()-1,
                                 "form":newBid,
-                                "allBids":listing.Bids.latest('time'),
+                                "highestBid":listing.Bids.latest('time'),
                                 "isOwner":request.user==listing.Owner,
                                 "watching":listing in request.user.Watchlist.all(),
                                 "loggedIn":request.user.is_authenticated,
@@ -239,6 +254,7 @@ def listing(request,ID):
                                 "comments":Comment.objects.filter(Listing=listing)
                             }
                         )
+                    # correct bid made
                     elif value>listing.Price:
                         Listing.objects.filter(pk=ID).update(Price=value)
                         newBidMade=Bid(Bidder=request.user, currentBid=value)
@@ -249,7 +265,7 @@ def listing(request,ID):
                                 "listing":listing,
                                 "bids":listing.Bids.all().count()-1,
                                 "form":newBid,
-                                "allBids":listing.Bids.latest('time'),
+                                "highestBid":listing.Bids.latest('time'),
                                 "isOwner":request.user==listing.Owner,
                                 "watching":listing in request.user.Watchlist.all(),
                                 "loggedIn":request.user.is_authenticated,
@@ -266,7 +282,7 @@ def listing(request,ID):
                                 "bids":listing.Bids.all().count()-1,
                                 "form":newBid,
                                 "error":"Error: Bid should be greater than the price",
-                                "allBids":listing.Bids.latest('time'),
+                                "highestBid":listing.Bids.latest('time'),
                                 "isOwner":request.user==listing.Owner,
                                 "loggedIn":request.user.is_authenticated,
                                 "watching":listing in request.user.Watchlist.all(),
@@ -275,21 +291,24 @@ def listing(request,ID):
                             }
                         )   
         else:
+            #user not logged in
             return render(
                 request, "auctions/listingPage.html",{
                     "listing":listing,
                     "bids":listing.Bids.all().count()-1,
-                    "allBids":listing.Bids.latest('time'),
+                    "highestBid":listing.Bids.latest('time'),
                     "loggedIn":request.user.is_authenticated,
                     "comments":Comment.objects.filter(Listing=listing)
                 }
             )
+    # for get requests (no form submissions)
     if request.user.is_authenticated:
+        #display this for logged in user
         return render(
             request, "auctions/listingPage.html",{
                 "listing":listing,
                 "bids":listing.Bids.all().count()-1,
-                "allBids":listing.Bids.latest('time'),
+                "highestBid":listing.Bids.latest('time'),
                 "form":newBid,
                 "loggedIn":request.user.is_authenticated,
                 "watching":listing in request.user.Watchlist.all(),
@@ -299,11 +318,12 @@ def listing(request,ID):
             }
         )
     else:
+        #display this for a user logged out (no forms available)
         return render(
             request, "auctions/listingPage.html",{
                 "listing":listing,
                 "bids":listing.Bids.all().count()-1,
-                "allBids":listing.Bids.latest('time'),
+                "highestBid":listing.Bids.latest('time'),
                 "form":newBid,
                 "loggedIn":request.user.is_authenticated,
                 "isOwner":request.user==listing.Owner,

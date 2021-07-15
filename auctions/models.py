@@ -47,5 +47,7 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"{self.User}: {self.content}"
+    def datePosted(self):
+        return self.date.strftime('%B %d %Y')
 
 

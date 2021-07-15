@@ -31,24 +31,26 @@
                 <form action="{% url 'listing' listing.id %}" method="POST">
                     {%csrf_token%}
                     <input type="submit" name="action" class="btn btn-danger" value="End Biddings">
-                </form>
+                </form><br>
             {%else%}
                 <form action="{% url 'listing' listing.id %}" method="POST">
                     {%csrf_token%}
                     {{form}}
                     <input type="submit" class="btn btn-info" value="Add Bid">
-                </form>
+                </form><br>
                 
             {%endif%}
 
         {%else%}
-            <h2>Winner: {{allBids.Bidder}}</h2>
+            <h2>Winner: {{highestBid.Bidder}}</h2>
         {%endif%}
-    <p>{{listing.Description}}</p>
+    <h6>{{listing.Description}}</h6>
     {%if bids%}
         Number of bids={{bids}}<br>
-        {{allBids}}
+        {{highestBid}}
     {%endif%}
+    
+    <h3>Comments</h3>
     {%if loggedIn%}
         
         <hr>
@@ -58,12 +60,15 @@
             <input type="submit" name="comment" class="btn btn-info" value="Post Comment">
         </form>
     {%endif%}
-    <div class="container"><div class="panel-group">
+    
     {%for comment in comments%} 
-        <div class="panel panel-warning">
-            <div class="panel-heading">{{comment.User}}</div>
-            <div class="panel-body">{{comment.content}}</div>
+        <div class="card" style="margin: 1%;">
+            <div class="card-header bg-primary text-white" style="font-weight: bold;">{{comment.User}}</div>
+            <div class="card-body">
+                <div class="card-title text-primary">{{comment.content}}</div>
+            </div>
+            <div class="card-footer text-primary" style="font-size: x-small;">{{comment.datePosted}}</div>
         </div>
     {%endfor%}
-    </div></div>
+    
 {% endblock %}
