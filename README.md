@@ -15,4 +15,4 @@ Used Django framework (models and forms primarily) and SQLite as the database
 - add bids
 - end bidding (only the owner)
 
-##### Assignment taken from CS50 harvard project1 course on edX
+##### Assignment taken from CS50 harvard project2 course on edX
